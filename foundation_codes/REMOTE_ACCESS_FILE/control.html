@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PDF Controller</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js"></script>
+</head>
+<body style="background:#222; color:#fff; font-family:sans-serif;">
+
+  <div style="margin:10px;">
+    <button onclick="prevPage()">⬆ Move Up</button>
+    <button onclick="nextPage()">⬇ Move Down</button>
+    <span id="page_num"></span> / <span id="page_count"></span>
+  </div>
+
+  <canvas id="the-canvas" style="border:1px solid #ccc; margin:10px; background:white;"></canvas>
+  
+  <script>
+  const url = 'doc.pdf'; // local file
+  let pdfDoc = null,
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null,
+      canvas = document.getElementById('the-canvas'),
+      ctx = canvas.getContext('2d');
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+  function renderPage(num) {
+    pageRendering = true;
+    pdfDoc.getPage(num).then(function(page) {
+      // Base viewport
+      const viewport = page.getViewport({ scale: 1 });
+
+      // Calculate scale so it fits in window
+      const maxWidth = window.innerWidth * 0.95;   // 95% of window width
+      const maxHeight = window.innerHeight * 0.85; // 85% of window height (leave space for buttons)
+      const scale = Math.min(maxWidth / viewport.width, maxHeight / viewport.height);
+
+      const scaledViewport = page.getViewport({ scale: scale });
+
+      canvas.width = scaledViewport.width;
+      canvas.height = scaledViewport.height;
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: scaledViewport
+      };
+      const renderTask = page.render(renderContext);
+
+      renderTask.promise.then(function () {
+        pageRendering = false;
+        if (pageNumPending !== null) {
+          renderPage(pageNumPending);
+          pageNumPending = null;
+        }
+      });
+    });
+
+    document.getElementById('page_num').textContent = num;
+  }
+
+  function queueRenderPage(num) {
+    if (pageRendering) {
+      pageNumPending = num;
+    } else {
+      renderPage(num);
+    }
+  }
+
+  function prevPage() {
+    if (pageNum <= 1) return;
+    pageNum--;
+    queueRenderPage(pageNum);
+  }
+  function nextPage() {
+    if (pageNum >= pdfDoc.numPages) return;
+    pageNum++;
+    queueRenderPage(pageNum);
+  }
+
+  pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+    pdfDoc = pdfDoc_;
+    document.getElementById('page_count').textContent = pdfDoc.numPages;
+    renderPage(pageNum);
+  });
+
+  // Re-render when window resizes (fit to screen again)
+  window.addEventListener('resize', () => renderPage(pageNum));
+</script>
+
+
+</body>
+</html>
+
