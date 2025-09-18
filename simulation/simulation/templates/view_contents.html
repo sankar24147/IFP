@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Files in {{ path }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 6px; }
+        .folder { font-weight: bold; color: #007BFF; }
+        .file { color: #555; }
+        a { text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 12px;
+            background: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+        .back-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Files in {{ path }}</h1>
+
+    {% if parent_path %}
+        <a href="/view_contents?path={{ parent_path | urlencode }}" class="back-btn">⬅ Back</a>
+    {% else %}
+        <a href="/" class="back-btn">⬅ Home</a>
+    {% endif %}
+
+    <h2>Folders</h2>
+    <ul>
+        {% for f in folders %}
+            <li class="folder">
+                <a href="/view_contents?path={{ (path ~ '/' ~ f) | urlencode }}">{{ f }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Files</h2>
+    <ul>
+        {% for f in files %}
+            <li class="file">
+                <a href="/open?path={{ (path ~ '/' ~ f) | urlencode }}">{{ f }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connected Devices</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; }
+        table { border-collapse: collapse; width: 80%; margin-bottom: 30px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-right: 6px;
+            background: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #28a745;
+        }
+        .btn-secondary:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <h1>Connected Devices</h1>
+
+    <h2>USB Storage Devices</h2>
+    <table>
+        <tr><th>Name</th><th>Size</th><th>Actions</th></tr>
+        {% for d in usb_devices %}
+        <tr>
+            <td>{{ d.model }}</td>
+            <td>{{ d.size }}</td>
+            <td>
+                {% if d.mountpoint %}
+                    <!-- Instant Display button -->
+                    <a href="/instant_display?path={{ d.mountpoint }}" class="btn">Instant Display</a>
+                    
+                    <!-- Explore Device button -->
+                    <a href="/view_contents?path={{ d.mountpoint }}" class="btn btn-secondary">Explore Device</a>
+                {% else %}
+                    Not Mounted
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Email Mode Option -->
+    <h2>Email Mode</h2>
+    <a href="/email" class="btn">Go to Email Mode</a>
+</body>
+</html>
