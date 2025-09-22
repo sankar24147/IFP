@@ -27,11 +27,8 @@
 <body>
     <h1>Files in {{ path }}</h1>
 
-    {% if parent_path %}
-        <a href="/view_contents?path={{ parent_path | urlencode }}" class="back-btn">⬅ Back</a>
-    {% else %}
-        <a href="/" class="back-btn">⬅ Home</a>
-    {% endif %}
+    
+    <a href="/" class="back-btn">⬅ Home</a>
 
     <h2>Folders</h2>
     <ul>

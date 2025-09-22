@@ -1,3 +1,5 @@
+import subprocess, pyudev, psutil, os
+
 def driver():
     context = pyudev.Context()
     monitor = pyudev.Monitor.from_netlink(context)

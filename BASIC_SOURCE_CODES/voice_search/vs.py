@@ -15,4 +15,3 @@ def recognize_voice():
 		print("❌ Could not request results from Google Speech Recognition.")
 if __name__ == "__main__":
     recognize_voice()
-
