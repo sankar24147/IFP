@@ -22,13 +22,31 @@
         .back-btn:hover {
             background: #0056b3;
         }
+        .voice-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 12px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .voice-btn:hover {
+            background: #1e7e34;
+        }
+        #voice-output {
+            margin-top: 15px;
+            font-style: italic;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <h1>Files in {{ path }}</h1>
 
-    
     <a href="/" class="back-btn">⬅ Home</a>
+    <a href="/voice_search" class="voice-btn">🎤 Voice Search</a>
+    <p id="voice-output">(voice query will appear here)</p>
 
     <h2>Folders</h2>
     <ul>

@@ -3,14 +3,9 @@ from codes.latest_file import get_recently_added_file,open_file
 from codes.display_devices import get_bluetooth_devices,get_usb_devices,get_wifi_devices
 from codes.mail_projection import connect_to_email,fetch_attachments
 from codes.instant_display import get_recently_added_file, open
-import os
-import pyudev
-import psutil
-import subprocess
-import imaplib
-import email
+from codes.voice_search import voice_search
+import os, mimetypes, email, imaplib, subprocess, psutil, pyudev
 from email.header import decode_header
-import mimetypes
 
 app = Flask(__name__)
 
@@ -109,6 +104,10 @@ def project():
         return "File not found", 404
     return send_file(file_path)
 
+@app.route("/voice_search")
+def voice_search_route():
+    response = voice_search()
+    return response
 
 
 
