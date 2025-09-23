@@ -2,7 +2,7 @@ from flask import Flask,render_template,send_from_directory,request,send_file,re
 from codes.latest_file import get_recently_added_file,open_file
 from codes.display_devices import get_bluetooth_devices,get_usb_devices,get_wifi_devices
 from codes.mail_projection import connect_to_email,fetch_attachments
-from codes.instant_display import get_recently_added_file, open
+from codes.instant_display import open
 from codes.voice_search import voice_search
 import os, mimetypes, email, imaplib, subprocess, psutil, pyudev
 from email.header import decode_header

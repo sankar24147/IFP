@@ -1,4 +1,4 @@
-import subprocess, pyudev, psutil, os
+import subprocess, pyudev, psutil, os, stat
 
 def driver():
     context = pyudev.Context()
@@ -28,18 +28,43 @@ def open_file(file_path):
     
 
 def get_recently_added_file(mount_path):
-    try:
-        # Command to find the recently added file
-        cmd = f"find {mount_path} -type f -exec stat --format='%W %n' {{}} + | sort -nr | head -n1"
+    # try:
+    #     # Command to find the recently added file
+    #     cmd = f"find {mount_path} -type f -exec stat --format='%W %n' {{}} + | sort -nr | head -n1"
         
+    #     # Execute the command
+    #     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    #     if result.returncode == 0:
+    #         output = result.stdout.strip()
+    #         if output:
+    #             print("Recently added file:", output.split(' ', 1)[1])
+    #             return output.split(' ', 1)[1]  # Return just the file path
+    #         else:
+    #             print("No files found.")
+    #     else:
+    #         print("Error:", result.stderr)
+    
+    # except Exception as e:
+    #     print("Exception occurred:", e)
+    try:
+        print("Hi Hello vanakkam")
+        # Exclude hidden directories and Trash
+        cmd = (
+            f"find {mount_path} -type f "
+            f"-not -path '*/.Trash-*/*' -not -path '*/.*' "
+            f"-exec stat --format='%W %n' {{}} + | sort -nr | head -n1"
+        )
+
         # Execute the command
         result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         if result.returncode == 0:
             output = result.stdout.strip()
             if output:
-                print("Recently added file:", output.split(' ', 1)[1])
-                return output.split(' ', 1)[1]  # Return just the file path
+                filepath = output.split(' ', 1)[1]
+                print("Recently added file:", filepath)
+                return filepath  # Return just the file path
             else:
                 print("No files found.")
         else:
@@ -47,6 +72,7 @@ def get_recently_added_file(mount_path):
     
     except Exception as e:
         print("Exception occurred:", e)
+
 
 def find_latest_file(directory):
     try:

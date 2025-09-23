@@ -45,6 +45,7 @@ def speak(text):
     engine.runAndWait()
 
 def voice_search():
+    print("This is voice search AAAAAAAAAAAAAAAAAAAAAAA")
     with sr.Microphone() as source:
         speak("Listening... Please say your search query.")
         recognizer.adjust_for_ambient_noise(source)
