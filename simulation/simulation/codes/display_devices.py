@@ -4,7 +4,23 @@ import json
 from .collect_device import collect_devices
 
 def get_usb_devices():
+    # usb_devices = []
+    # try:
+    #     result = subprocess.check_output(
+    #         "lsblk -o NAME,SIZE,MODEL,MOUNTPOINT,RM,TRAN -J",
+    #         shell=True, text=True
+    #     )
+    #     data = json.loads(result)
+    #     for device in data['blockdevices']:
+    #         collect_devices(device, usb_devices)
+    # except Exception as e:
+    #     print("Error getting USB devices:", e)
+    # return usb_devices
+
+    '''
     usb_devices = []
+
+    # Detect block devices (pendrives, external HDDs)
     try:
         result = subprocess.check_output(
             "lsblk -o NAME,SIZE,MODEL,MOUNTPOINT,RM,TRAN -J",
@@ -14,7 +30,71 @@ def get_usb_devices():
         for device in data['blockdevices']:
             collect_devices(device, usb_devices)
     except Exception as e:
-        print("Error getting USB devices:", e)
+        print("Error getting USB block devices:", e)
+
+    # Detect MTP devices (phones)
+    gvfs_path = "/run/user/{}/gvfs".format(os.getuid())
+    if os.path.exists(gvfs_path):
+        for entry in os.listdir(gvfs_path):
+            if entry.startswith("mtp:"):
+                mountpoint = os.path.join(gvfs_path, entry)
+                device_name = "MTP Device"  # Default name
+                print(mountpoint,"    AAAAAAAAAAAAAAAAAAAAAAAAA")
+
+                # Use gvfs-info to get the real name
+                try:
+                    info_result = subprocess.check_output(
+                        f"gvfs-info '{mountpoint}'",
+                        shell=True, text=True
+                    )
+                    for line in info_result.splitlines():
+                        if "standard::name:" in line:
+                            device_name = line.split("standard::name:")[1].strip()
+                            break
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    print(f"Could not get info for {mountpoint}, using default name.")
+                
+                usb_devices.append({
+                    "model": device_name,
+                    "mountpoint": mountpoint,
+                    "type": "MTP"
+                })
+
+    return usb_devices
+    '''
+    usb_devices = []
+
+    # Detect block devices (pendrives, external HDDs)
+    try:
+        result = subprocess.check_output(
+            "lsblk -o NAME,SIZE,MODEL,MOUNTPOINT,RM,TRAN -J",
+            shell=True, text=True
+        )
+        data = json.loads(result)
+        for device in data['blockdevices']:
+            collect_devices(device, usb_devices)
+    except Exception as e:
+        print("Error getting USB block devices:", e)
+
+    # Detect MTP devices (phones) by parsing gvfs entry
+    gvfs_path = f"/run/user/{os.getuid()}/gvfs"
+    if os.path.exists(gvfs_path):
+        for entry in os.listdir(gvfs_path):
+            if entry.startswith("mtp:"):
+                raw_name = entry.replace("mtp:host=", "")
+                parts = raw_name.split("_")
+                if len(parts) >= 2:
+                    phone_name = f"{parts[0]} {parts[1]}"   # e.g. INFINIX Infinix
+                else:
+                    phone_name = raw_name
+
+                usb_devices.append({
+                    "model": phone_name,
+                    "size": "Unknown (MTP)",
+                    "mountpoint": os.path.join(gvfs_path, entry),
+                    "type": "MTP"
+                })
+
     return usb_devices
 
 def get_wifi_devices():
